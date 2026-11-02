@@ -1,0 +1,15 @@
+
+ ⛅️ wrangler 4.152.0 (update available 4.156.2)
+───────────────────────────────────────────────
+Total Upload: 4383.70 KiB / gzip: 947.48 KiB
+Your Worker has access to the following bindings:
+Binding                                                      Resource
+env.RESEARCH (PlantResearch)                                 Workflow
+env.LIVE (associated-sales-live)                             D1 Database
+env.DEMO (associated-sales-demo)                             D1 Database
+env.EVIDENCE (associated-sales-evidence)                     R2 Bucket
+env.PRIVATE_SITE ("true")                                    Environment Variable
+env.ANTHROPIC_MODEL ("claude-sonnet-4-6")                    Environment Variable
+env.MAX_MODEL_CALLS_PER_DAY ("20")                           Environment Variable
+
+--dry-run: exiting now.

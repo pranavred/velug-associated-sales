@@ -1,0 +1,57 @@
+{
+  "name": "associated-sales",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "demo": "tsx src/cli.ts demo",
+    "collect": "tsx src/cli.ts collect",
+    "discover": "tsx src/cli.ts discover",
+    "synthesize": "tsx src/cli.ts synthesize",
+    "tick": "tsx src/cli.ts tick",
+    "worker": "tsx src/cli.ts worker",
+    "dashboard": "tsx src/cli.ts serve",
+    "status": "tsx src/cli.ts status",
+    "approve-source": "tsx src/cli.ts approve",
+    "schedule": "tsx src/cli.ts schedule",
+    "test": "tsx --test test/*.test.ts",
+    "check": "tsc --noEmit",
+    "format": "prettier --write src test",
+    "evaluate": "tsx src/report.ts evaluate",
+    "diff": "tsx src/report.ts diff",
+    "verify": "npm run check && npm test",
+    "prepare-demo": "npm run demo && npm run diff",
+    "cloud:check": "tsc -p cloud/tsconfig.json",
+    "cloud:export": "tsx cloud/export.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.3.0",
+    "cheerio": "1.0.0",
+    "htmlparser2": "^12.0.0",
+    "pdfjs-dist": "^4.10.38",
+    "unpdf": "^1.9.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261024.1",
+    "@fontsource-variable/manrope": "^5.3.0",
+    "@types/node": "^22.0.0",
+    "prettier": "^3.9.10",
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.0",
+    "wrangler": "^4.152.0"
+  },
+  "overrides": {
+    "undici": "^7.30.1"
+  },
+  "description": "Velug plant research and sales qualification prototype",
+  "license": "MIT",
+  "homepage": "https://github.com/pranavred/velug-associated-sales",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pranavred/velug-associated-sales.git"
+  }
+}

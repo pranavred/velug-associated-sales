@@ -1,0 +1,34 @@
+
+> associated-sales@0.1.0 prepare-demo
+> npm run demo && npm run diff
+
+
+> associated-sales@0.1.0 demo
+> tsx src/cli.ts demo
+
+Synthetic demonstration saved. Run npm run dashboard. No model or network calls.
+(node:53836) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> associated-sales@0.1.0 diff
+> tsx src/report.ts diff
+
+{
+  "mode": "demo",
+  "source": "SRC-001",
+  "comparison": "Two most recently stored distinct versions; not necessarily the last fetch transition",
+  "before": "a920d9c2a47c4366d1aae7a64682554d7fbd81a8fd85b6d20c62f0f0aeedff4c",
+  "after": "e193f54974e7fab61523e2322afb85a785024d5507e253ad0cb4b75fffa4021a",
+  "changes": [
+    {
+      "locator": "Synthetic fixture paragraph 2",
+      "kind": "added",
+      "before": null,
+      "after": "SYNTHETIC DEMO ONLY. NY0004189: A fictional notice announces a process-water upgrade. It does not establish completed construction."
+    }
+  ],
+  "interpretation": "Text changes require semantic review. They do not establish a business event or buying intent."
+}
+Report: /Users/pranavreddy/development/Velug/associated-sales/data/demo/reports/diff-SRC-001.json
+(node:53863) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)

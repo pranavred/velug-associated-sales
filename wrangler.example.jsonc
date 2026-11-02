@@ -1,0 +1,60 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "associated-sales",
+  "main": "cloud/worker.ts",
+  "compatibility_date": "2026-10-23",
+  "workers_dev": false,
+  "preview_urls": false,
+  "rules": [
+    {
+      "type": "Text",
+      "globs": [
+        "**/*.html"
+      ],
+      "fallthrough": true
+    },
+    {
+      "type": "Data",
+      "globs": [
+        "**/*.woff2"
+      ],
+      "fallthrough": true
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "LIVE",
+      "database_name": "associated-sales-live",
+      "database_id": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "binding": "DEMO",
+      "database_name": "associated-sales-demo",
+      "database_id": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "EVIDENCE",
+      "bucket_name": "associated-sales-evidence"
+    }
+  ],
+  "vars": {
+    "PRIVATE_SITE": "true",
+    "ANTHROPIC_MODEL": "claude-sonnet-4-6",
+    "MAX_MODEL_CALLS_PER_DAY": "20"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "workflows": [
+    {
+      "name": "associated-sales-research",
+      "binding": "RESEARCH",
+      "class_name": "PlantResearch"
+    }
+  ],
+  "compatibility_flags": [
+    "nodejs_compat"
+  ]
+}
