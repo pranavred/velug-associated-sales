@@ -3,9 +3,14 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { startServer } from "../../app/server.js";
-import { signIn, sessionPrincipal,provisionCompany,activateInvite } from "../../app/auth.js";
+import {
+  signIn,
+  sessionPrincipal,
+  provisionCompany,
+  activateInvite,
+} from "../../app/auth.js";
 import { createResearch, processResearch } from "../../app/jobs.js";
-import { listInventory } from "../../app/inventory.js";
+import { listInventory, importInventory } from "../../app/inventory.js";
 for (const prefix of ["/associated-sales", ""])
   test(`workspace flow at ${prefix || "root"}`, async ({ page, browser }) => {
     const dir = await mkdtemp(join(tmpdir(), "associated-sales-browser-"));
@@ -206,19 +211,182 @@ for (const prefix of ["/associated-sales", ""])
     }
   });
 
-test('shared browser tabs keep the visible company and mutation target aligned',async({page})=>{
- const dir=await mkdtemp(join(tmpdir(),'associated-sales-tabs-'));
- const runtime=await startServer({PORT:'4419',PUBLIC_ORIGIN:'http://127.0.0.1:4419',BASE_PATH:'/associated-sales',DATABASE_PATH:join(dir,'test.sqlite'),BOOTSTRAP_EMAIL:'owner@example.test',BOOTSTRAP_PASSWORD:'browser owner password only',BOOTSTRAP_COMPANY:'Company A'});
- try{
-  const principal=(await sessionPrincipal(runtime.db,(await signIn(runtime.db,'owner@example.test','browser owner password only')).token))!;
-  const b=await provisionCompany(runtime.db,principal,'Company B',principal.email);await activateInvite(runtime.db,b.token,'browser owner password only');
-  const origin='http://127.0.0.1:4419/associated-sales';await page.goto(origin);await page.getByLabel('Work email').fill(principal.email);await page.getByLabel('Password',{exact:true}).fill('browser owner password only');await page.getByRole('button',{name:'Sign in',exact:true}).click();await expect(page.locator('#company')).toHaveValue(principal.companyId);
-  const second=await page.context().newPage();await second.goto(origin+'/research');await second.locator('#company').selectOption(b.companyId);await expect(second.locator('#company')).toHaveValue(b.companyId);
-  await page.getByRole('link',{name:'Settings',exact:true}).click();await expect(page.locator('#company')).toHaveValue(b.companyId);await page.getByLabel('Label',{exact:true}).fill('B connector');await page.getByRole('button',{name:'Create token',exact:true}).click();await expect(page.locator('#new-token code')).toBeVisible();await assertToken('B connector',b.companyId);
-  await page.locator('#company').selectOption(principal.companyId);await page.getByRole('link',{name:'Settings',exact:true}).click();await expect(page.locator('#company')).toHaveValue(principal.companyId);await page.getByLabel('Label',{exact:true}).fill('Stale A connector');
-  await second.reload();await second.locator('#company').selectOption(b.companyId);await expect(second.locator('#company')).toHaveValue(b.companyId);
-  await page.getByRole('button',{name:'Create token',exact:true}).click();await expect(page.getByRole('status')).toContainText('Company changed');await expect(page.locator('#company')).toHaveValue(b.companyId);expect(await runtime.db.get('SELECT id FROM integration_tokens WHERE label=?','Stale A connector')).toBeUndefined();
-  await second.close();
-  async function assertToken(label:string,companyId:string){expect((await runtime.db.get('SELECT company_id FROM integration_tokens WHERE label=?',label))?.company_id).toBe(companyId);}
- }finally{await runtime.stop();await rm(dir,{recursive:true,force:true});}
+test("shared browser tabs keep the visible company and mutation target aligned", async ({
+  page,
+}) => {
+  const dir = await mkdtemp(join(tmpdir(), "associated-sales-tabs-"));
+  const runtime = await startServer({
+    PORT: "4419",
+    PUBLIC_ORIGIN: "http://127.0.0.1:4419",
+    BASE_PATH: "/associated-sales",
+    DATABASE_PATH: join(dir, "test.sqlite"),
+    BOOTSTRAP_EMAIL: "owner@example.test",
+    BOOTSTRAP_PASSWORD: "browser owner password only",
+    BOOTSTRAP_COMPANY: "Company A",
+  });
+  try {
+    const principal = (await sessionPrincipal(
+      runtime.db,
+      (
+        await signIn(
+          runtime.db,
+          "owner@example.test",
+          "browser owner password only",
+        )
+      ).token,
+    ))!;
+    const b = await provisionCompany(
+      runtime.db,
+      principal,
+      "Company B",
+      principal.email,
+    );
+    await activateInvite(runtime.db, b.token, "browser owner password only");
+    const origin = "http://127.0.0.1:4419/associated-sales";
+    await page.goto(origin);
+    await page.getByLabel("Work email").fill(principal.email);
+    await page
+      .getByLabel("Password", { exact: true })
+      .fill("browser owner password only");
+    await page.getByRole("button", { name: "Sign in", exact: true }).click();
+    await expect(page.locator("#company")).toHaveValue(principal.companyId);
+    const second = await page.context().newPage();
+    await second.goto(origin + "/research");
+    await second.locator("#company").selectOption(b.companyId);
+    await expect(second.locator("#company")).toHaveValue(b.companyId);
+    await page.getByRole("link", { name: "Settings", exact: true }).click();
+    await expect(page.locator("#company")).toHaveValue(b.companyId);
+    await page.getByLabel("Label", { exact: true }).fill("B connector");
+    await page
+      .getByRole("button", { name: "Create token", exact: true })
+      .click();
+    await expect(page.locator("#new-token code")).toBeVisible();
+    await assertToken("B connector", b.companyId);
+    await page.locator("#company").selectOption(principal.companyId);
+    await page.getByRole("link", { name: "Settings", exact: true }).click();
+    await expect(page.locator("#company")).toHaveValue(principal.companyId);
+    await page.getByLabel("Label", { exact: true }).fill("Stale A connector");
+    await second.reload();
+    await second.locator("#company").selectOption(b.companyId);
+    await expect(second.locator("#company")).toHaveValue(b.companyId);
+    await page
+      .getByRole("button", { name: "Create token", exact: true })
+      .click();
+    await expect(page.getByRole("status")).toContainText("Company changed");
+    await expect(page.locator("#company")).toHaveValue(b.companyId);
+    expect(
+      await runtime.db.get(
+        "SELECT id FROM integration_tokens WHERE label=?",
+        "Stale A connector",
+      ),
+    ).toBeUndefined();
+    await second.close();
+    await importInventory(runtime.db, principal, {
+      source: "erp",
+      key: "a",
+      mode: "replace",
+      rows: [{ sku: "A-PRIVATE", name: "A confidential part" }],
+    });
+    await importInventory(
+      runtime.db,
+      { ...principal, companyId: b.companyId },
+      {
+        source: "erp",
+        key: "b",
+        mode: "replace",
+        rows: [{ sku: "B-PART", name: "B public part" }],
+      },
+    );
+    let release!: () => void, ready!: () => void;
+    const held = new Promise<void>((r) => (release = r)),
+      intercepted = new Promise<void>((r) => (ready = r));
+    await page.route("**/api/inventory?offset=0", async (route) => {
+      if (
+        route.request().headers()["x-associated-sales-company"] ===
+        principal.companyId
+      ) {
+        const response = await route.fetch();
+        ready();
+        await held;
+        await route.fulfill({ response });
+      } else await route.continue();
+    });
+    await page.locator("#company").selectOption(principal.companyId);
+    await page
+      .getByRole("heading", { name: "Know the buyer. Find the next fit." })
+      .waitFor();
+    await page.getByRole("link", { name: "Inventory", exact: true }).click();
+    await intercepted;
+    await page.locator("#company").selectOption(b.companyId);
+    await page
+      .getByRole("heading", { name: "Know the buyer. Find the next fit." })
+      .waitFor();
+    await page.getByRole("link", { name: "Inventory", exact: true }).click();
+    await expect(
+      page.getByText("B public part", { exact: true }),
+    ).toBeVisible();
+    const oldResponse = page.waitForResponse(
+      (r) =>
+        r.url().includes("/api/inventory?offset=0") &&
+        r.request().headers()["x-associated-sales-company"] ===
+          principal.companyId,
+    );
+    release();
+    await (await oldResponse).finished();
+    await page.evaluate(
+      () =>
+        new Promise((r) =>
+          requestAnimationFrame(() => requestAnimationFrame(r)),
+        ),
+    );
+    await expect(
+      page.getByText("A confidential part", { exact: true }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByText("B public part", { exact: true }),
+    ).toBeVisible();
+    await page.getByRole("link", { name: "Settings", exact: true }).click();
+    await page.getByLabel("Label", { exact: true }).waitFor();
+    let failSwitch!: () => void;
+    const switchHeld = new Promise<void>((r) => (failSwitch = r));
+    await page.route("**/api/company", async (route) => {
+      await switchHeld;
+      await route.fulfill({
+        status: 429,
+        contentType: "application/json",
+        body: JSON.stringify({ error: "Test switch failure" }),
+      });
+    });
+    await page.locator("#company").selectOption(principal.companyId);
+    try {
+      expect(await page.locator("#company").inputValue()).toBe(b.companyId);
+      expect(await page.locator("#shell").evaluate((el) => el.inert)).toBe(
+        true,
+      );
+    } finally {
+      failSwitch();
+    }
+    await expect(page.getByRole("status")).toContainText("Test switch failure");
+    await expect(page.locator("#company")).toHaveValue(b.companyId);
+    await expect(page.locator("#shell")).toHaveJSProperty("inert", false);
+    await page.getByLabel("Label", { exact: true }).fill("After failed switch");
+    await page
+      .getByRole("button", { name: "Create token", exact: true })
+      .click();
+    await expect(page.locator("#new-token code")).toBeVisible();
+    await assertToken("After failed switch", b.companyId);
+    async function assertToken(label: string, companyId: string) {
+      expect(
+        (
+          await runtime.db.get(
+            "SELECT company_id FROM integration_tokens WHERE label=?",
+            label,
+          )
+        )?.company_id,
+      ).toBe(companyId);
+    }
+  } finally {
+    await runtime.stop();
+    await rm(dir, { recursive: true, force: true });
+  }
 });

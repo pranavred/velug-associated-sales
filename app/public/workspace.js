@@ -30,6 +30,7 @@ function inform(message, error = false) {
   noticeTimer = setTimeout(() => (notice.hidden = true), error ? 10000 : 5000);
 }
 async function api(path, body, method) {
+  const requestGeneration = generation;
   const res = await fetch(url("/api" + path), {
     method: method || (body === undefined ? "GET" : "POST"),
     credentials: "same-origin",
@@ -42,9 +43,12 @@ async function api(path, body, method) {
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   const data = await res.json();
+  if (requestGeneration !== generation)
+    throw Error(
+      "Workspace changed while this request was running. Reload the current view to check its outcome.",
+    );
   if (!res.ok) {
     if (res.status === 409 && data.error?.startsWith("Company changed")) {
-      session = await api("/session");
       void render();
     }
     if (res.status === 401 && session) {
@@ -103,12 +107,17 @@ function navigation(path) {
   const owner = session.user.role === "owner";
   shell.innerHTML = `<header class="topbar"><a class="brand" href="${url("/research")}" data-nav="/research">Associated Sales<small>By Velug</small></a><div class="top-actions"><label><span class="sr-only" hidden>Company</span><select id="company" aria-label="Current company">${session.companies.map((c) => `<option value="${esc(c.id)}" ${c.id === session.user.companyId ? "selected" : ""}>${esc(c.name)}</option>`).join("")}</select></label><button class="secondary" id="signout">Sign out</button></div></header><div class="layout"><nav class="sidebar" aria-label="Workspace"><a href="${url("/research")}" data-nav="/research" ${path.startsWith("/research") ? 'aria-current="page"' : ""}>Research</a><a href="${url("/inventory")}" data-nav="/inventory" ${path === "/inventory" ? 'aria-current="page"' : ""}>Inventory</a>${owner ? `<a href="${url("/team")}" data-nav="/team" ${path === "/team" ? 'aria-current="page"' : ""}>Team</a>` : ""}<a href="${url("/settings")}" data-nav="/settings" ${path === "/settings" ? 'aria-current="page"' : ""}>Settings</a><div class="sidebar-foot">${esc(session.user.email)}<br>${esc(session.user.role)} access<br><br><a href="https://github.com/pranavred/velug-associated-sales" target="_blank" rel="noopener noreferrer">Open-source code ↗</a></div></nav><main id="main"><p class="loading">Loading…</p></main></div>`;
   document.querySelector("#company").addEventListener("change", async (e) => {
+    const requestedCompany = e.target.value;
+    e.target.value = session.user.companyId;
+    shell.inert = true;
     try {
-      await api("/company", { id: e.target.value });
-      session = await api("/session");
-      go("/research");
+      await api("/company", { id: requestedCompany });
+      history.pushState({}, "", url("/research"));
     } catch (e) {
       inform(e.message, true);
+    } finally {
+      await render();
+      shell.inert = false;
     }
   });
   action("#signout", async () => {
@@ -131,7 +140,6 @@ function auth(activate = false) {
       go("/login");
     } else {
       await api("/login", input);
-      session = await api("/session");
       go("/research");
     }
   });
@@ -146,9 +154,11 @@ async function render() {
     return;
   }
   try {
-    session = await api("/session");
+    const nextSession = await api("/session");
+    if (turn !== generation) return;
+    session = nextSession;
   } catch {
-    auth(false);
+    if (turn === generation) auth(false);
     return;
   }
   if (turn !== generation) return;
