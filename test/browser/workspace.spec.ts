@@ -360,7 +360,7 @@ test("shared browser tabs keep the visible company and mutation target aligned",
     await page.locator("#company").selectOption(principal.companyId);
     try {
       expect(await page.locator("#company").inputValue()).toBe(b.companyId);
-      expect(await page.locator("#shell").evaluate((el) => el.inert)).toBe(
+      expect(await page.locator("#shell").evaluate((el) => (el as HTMLElement).inert)).toBe(
         true,
       );
     } finally {
