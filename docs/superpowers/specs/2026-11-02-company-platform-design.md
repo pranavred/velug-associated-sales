@@ -1,0 +1,35 @@
+# Associated Sales company platform
+
+The user authorized implementing the previously documented inventory, company-access, live-validation and URL-prefix requirements. They want an easily self-hosted application that researches any manufacturer/company and helps sellers qualify upsell or complementary-product opportunities from their own inventories. The public brand remains Associated Sales by Velug; no unrelated company branding is used. Outreach remains drafts only.
+
+## Implementation decisions
+
+These are engineering defaults selected for this request, not additional user requirements. Retain the original research demonstration, but introduce a separate authenticated application with shared TypeScript domain/HTTP logic. Run it on Node 22 with SQLite for a private, single-replica Docker deployment, or Cloudflare Workers/D1 with durable Workflows for Velug. Both use the same schema and tenant-scoped queries. Document SQLite's single-replica limit instead of claiming arbitrary enterprise scale or certification.
+
+Use the existing Velug OpenAI credential only server-side for bounded live validation and deployment. The research API uses Responses web search; catalog matching uses structured output. Users self-host with their own API key. No company inventory is sent to other companies. The interface explicitly describes which catalog fields are sent to the configured AI provider. Do not claim certified compatibility or guaranteed commercial results.
+
+## Access and isolation
+
+No open registration or shared demo password in the new application. A deployment administrator initializes the first organization and owner through a local bootstrap command or a one-time setup secret. Users have individual passwords, opaque expiring sessions, and owner/member roles. Owners can invite and revoke team members. A platform administrator can provision additional organizations. A user may belong to multiple organizations and must explicitly switch the active organization. Session membership is checked on every request; revoked membership immediately loses access. Each inventory, integration token, research run, review and export belongs to an organization, with compound ownership checks on reads and writes. Mutations require same-origin checks for browser sessions. Integration tokens are hashed and restricted to inventory access, scoped to a single source/organization, shown only once and revocable. Never return password hashes, session/token digests, provider keys or other tenants' records.
+
+## Inventory
+
+Support UTF-8 CSV (quoted fields, BOM and CRLF), JSON rows, user-selected column mapping, and a documented JSON push API for ERP automation. Include a runnable reference sync client and sample fixtures. No claim of native SAP/NetSuite/etc. support. Records carry SKU, name, description, application tags, quantity (nullable), unit, regions, grade/specifications, SDS/TDS URLs and active status. Stock is not product compatibility. Validate the complete import before writing; duplicate SKUs or malformed rows reject atomically. Imports are scoped by source, support upsert or full snapshot replacement, provide idempotency keys and audit receipts, and timestamp synchronization. Repeated keys with different payloads conflict. An empty snapshot cannot silently erase inventory. Exclude inactive, zero-stock, stale or geographically incompatible products from proposed recommendations; unknown availability is visibly unverified. Display rejected or excluded counts.
+
+## Research and sales qualification
+
+Input: company/manufacturer name, optional public website, location/market and sales objective. Research distinguishes a parent company from a specific facility and can return unresolved identity or insufficient evidence. Use live web search and preserve provider-returned citations/source URLs, narrative, timestamps, model and usage. Treat all source/catalog content as untrusted data. Provider citations are traceability, not independently verified truth. The server never fetches arbitrary catalog/source URLs into the company network.
+
+Run matching against a bounded eligible catalog candidate set, exposing coverage when the catalog is larger. Validate every returned product ID and cited source ID against the supplied sets. Recommendations are qualification hypotheses with type (upsell, complementary, replacement), rationale, evidence references, missing constraints, disqualifiers and questions. Unsupported IDs/citations fail validation. A rep can record answers and mark a suggestion qualified, rejected or pending. Inventory updates can invalidate old suggestions; views recheck eligibility and clearly mark stale matches. Preserve the research snapshot and record current catalog differences.
+
+Jobs are durable, scoped, idempotent for duplicate submissions and independently observable. Node uses a persisted queue and lease; Cloudflare Workflows invokes the same processing function. Bound model calls, output size, job concurrency and daily organization usage. Failures and cancellations are explicit; do not automatically retry uncertain chargeable calls. Store usage rather than claiming a dollar budget from call counts.
+
+## UX and deployment
+
+A responsive, restrained workspace using the existing Manrope font: company switcher, inventory/import, research form and runs, cited opportunity details/questions, team/integration settings. Accessible labels, keyboard focus, loading/empty/error states, mobile layouts, dark mode. Root and configurable prefix deployments use one path builder; the requested Velug prefix is `/associated-sales`. Scope and name cookies independently from other Velug apps; verify API, asset, invite, redirect and deep links under the prefix. Do not integrate unfinished website changes.
+
+Include Dockerfile/Compose, health/readiness checks, persistent-volume/backup/restore instructions, environment templates, schema migration, bootstrap CLI, Cloudflare setup, inventory API examples, and tests in CI. Never include secrets, third-party photos, private datasets or live infrastructure IDs in GitHub. Velug deployment uses newly provisioned resources, leaving the legacy private demo untouched.
+
+## Acceptance
+
+Prove two organizations cannot read/mutate each other's data, tokens or jobs; member revocation and token revocation work; unauthorized/cross-origin requests are denied. Prove complete import validation, idempotency and source-scoped replacement, stock/staleness exclusion, forged model product/source rejection, job lease protection and prefix routing. Run the existing 34-test suite plus new integration tests using real temporary SQLite databases. Test shared code in local Workers/D1 as well. Run bounded real public-company research using synthetic catalog records; independently inspect cited facts and whether questions/recommendations are supported. Verify a real imported catalog → research → actual eligible SKU → question → saved answer flow, container build, and the deployed URL before claiming complete. Record remaining limitations honestly.
