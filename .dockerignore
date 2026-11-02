@@ -1,0 +1,8 @@
+*
+!package.json
+!package-lock.json
+!tsconfig.app.json
+!app/
+!app/**
+!scripts/
+!scripts/build-platform.mjs

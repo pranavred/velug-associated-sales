@@ -11,10 +11,25 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
           cache: npm
       - run: npm ci
       - run: npm run verify
       - run: npm run cloud:check
+      - run: npm run build
+      - run: npm run platform:cloud:check
+      - run: npm run test:d1
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      - run: npx wrangler deploy --dry-run --config wrangler.platform.example.jsonc
       - run: npx wrangler deploy --dry-run --config wrangler.example.jsonc
       - run: npm run prepare-demo
+      - run: docker build -t associated-sales:test .
+      - name: Verify container boot and persistence
+        run: |
+          docker run -d --name sales-test -p 4319:4319 -e PUBLIC_ORIGIN=http://127.0.0.1:4319 -e BOOTSTRAP_EMAIL=ci@example.test -e BOOTSTRAP_PASSWORD='CI synthetic owner passphrase' -e BOOTSTRAP_COMPANY='CI company' associated-sales:test
+          for attempt in $(seq 1 20); do curl --fail http://127.0.0.1:4319/associated-sales/api/health && break || sleep 1; done
+          curl --fail -H 'Origin: http://127.0.0.1:4319' -H 'Content-Type: application/json' -d '{"email":"ci@example.test","password":"CI synthetic owner passphrase"}' http://127.0.0.1:4319/associated-sales/api/login
+          docker restart sales-test
+          for attempt in $(seq 1 20); do curl --fail http://127.0.0.1:4319/associated-sales/api/health && break || sleep 1; done
+          curl --fail -H 'Origin: http://127.0.0.1:4319' -H 'Content-Type: application/json' -d '{"email":"ci@example.test","password":"CI synthetic owner passphrase"}' http://127.0.0.1:4319/associated-sales/api/login

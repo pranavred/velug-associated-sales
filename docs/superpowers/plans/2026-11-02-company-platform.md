@@ -28,33 +28,33 @@
 
 Files: `app/db.ts`, `app/node-db.ts`, `app/schema.ts`, `app/auth.ts`, `app/config.ts`, `test/platform-auth.test.ts`.
 Interfaces: async `Sql.all/get/run/batch`; `Principal {userId,companyId,role,platformAdmin}`; bootstrap, signIn, authenticate, invite/activate, switchCompany, revokeMember; safe path/config helpers.
-- [ ] Write tests for two organizations, password failure, membership/session revocation, invite reuse, owner/member permissions and transaction rollback; run red.
-- [ ] Implement schema, SQLite adapter, password/session/invite/token primitives and organization provisioning.
-- [ ] Run auth tests and existing suite; commit.
+- [x] Write tests for two organizations, password failure, membership/session revocation, invite reuse, owner/member permissions and transaction rollback; run red.
+- [x] Implement schema, SQLite adapter, password/session/invite/token primitives and organization provisioning.
+- [x] Run auth tests and existing suite; commit.
 
 ### Task 2: Inventory and integration API domain
 
 Files: `app/inventory.ts`, `app/csv.ts`, `test/platform-inventory.test.ts`, `examples/inventory.csv`, `scripts/sync-inventory.mjs`.
 Consumes Task 1 SQL/principal; produces parse/import/list/eligible functions with source-scoped atomic receipts.
-- [ ] Write tests for CSV quoting/BOM, mapping, invalid/duplicate rows, idempotency conflicts, source isolation, replacement, inactive/out-of-stock/stale/region filtering; run red.
-- [ ] Implement imports, tokens, example fixtures and sync client.
-- [ ] Run domain suite and commit.
+- [x] Write tests for CSV quoting/BOM, mapping, invalid/duplicate rows, idempotency conflicts, source isolation, replacement, inactive/out-of-stock/stale/region filtering; run red.
+- [x] Implement imports, tokens, example fixtures and sync client.
+- [x] Run domain suite and commit.
 
 ### Task 3: Research, catalog matching and durable jobs
 
 Files: `app/research.ts`, `app/provider.ts`, `app/jobs.ts`, `test/platform-research.test.ts`.
 Consumes Task 2 eligible catalog; produces scoped job create/process/cancel/list/get/review and validated provider artifacts.
-- [ ] Write tests for forged IDs/citations, ambiguous identity, insufficient evidence, failed provider, budget/lease enforcement, cancellation, tenant reads and stale inventory; run red.
-- [ ] Implement bounded web research, structured matching, job persistence/leases and answer/review records. Mock only external HTTP in deterministic tests.
-- [ ] Run suite; perform bounded live validation when runtime exists; commit.
+- [x] Write tests for forged IDs/citations, ambiguous identity, insufficient evidence, failed provider, budget/lease enforcement, cancellation, tenant reads and stale inventory; run red.
+- [x] Implement bounded web research, structured matching, job persistence/leases and answer/review records. Mock only external HTTP in deterministic tests.
+- [x] Run suite; perform bounded live validation when runtime exists; commit.
 
 ### Task 4: HTTP runtime and browser workspace
 
 Files: `app/http.ts`, `app/server.ts`, `app/public/*`, `test/platform-http.test.ts`, `scripts/platform-browser-smoke.mjs`.
 Consumes domain functions; produces prefix-safe JSON routes and accessible workspace with auth, imports, research/results, saved answers, team and tokens.
-- [ ] Write HTTP tests using real temporary DB for unauthorized/cross-origin access, body limits, token restrictions, tenant isolation, prefix cookies/assets and deep links; run red.
-- [ ] Implement router, Node adapter, bootstrap CLI, background runner and workspace. Reuse Manrope.
-- [ ] Run full suite, browser smoke and live synthetic-catalog validation; commit.
+- [x] Write HTTP tests using real temporary DB for unauthorized/cross-origin access, body limits, token restrictions, tenant isolation, prefix cookies/assets and deep links; run red.
+- [x] Implement router, Node adapter, bootstrap CLI, background runner and workspace. Reuse Manrope.
+- [x] Run full suite, browser smoke and live synthetic-catalog validation; commit.
 
 ### Task 5: Portable and Cloudflare deployment
 

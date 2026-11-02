@@ -81,6 +81,7 @@ node_modules/@napi-rs/canvas-linux-x64-musl,0.1.100,MIT,False,True
 node_modules/@napi-rs/canvas-win32-arm64-msvc,0.1.100,MIT,False,True
 node_modules/@napi-rs/canvas-win32-x64-msvc,0.1.100,MIT,False,True
 node_modules/@opentelemetry/api,1.10.0,Apache-2.0,False,False
+node_modules/@playwright/test,1.62.1,Apache-2.0,True,False
 node_modules/@poppinss/colors,4.1.6,MIT,True,False
 node_modules/@poppinss/dumper,0.6.5,MIT,True,False
 node_modules/@poppinss/exception,1.2.3,MIT,True,False
@@ -125,6 +126,9 @@ node_modules/parse5/node_modules/entities,6.0.1,BSD-2-Clause,False,False
 node_modules/path-to-regexp,6.3.0,MIT,True,False
 node_modules/pathe,2.0.3,MIT,True,False
 node_modules/pdfjs-dist,4.10.38,Apache-2.0,False,False
+node_modules/playwright,1.62.1,Apache-2.0,True,False
+node_modules/playwright-core,1.62.1,Apache-2.0,True,False
+node_modules/playwright/node_modules/fsevents,2.3.2,MIT,True,True
 node_modules/prettier,3.9.10,MIT,True,False
 node_modules/safer-buffer,2.1.2,MIT,False,False
 node_modules/semver,7.8.5,ISC,True,False

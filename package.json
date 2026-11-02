@@ -1,6 +1,6 @@
 {
   "name": "associated-sales",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -25,7 +25,14 @@
     "verify": "npm run check && npm test",
     "prepare-demo": "npm run demo && npm run diff",
     "cloud:check": "tsc -p cloud/tsconfig.json",
-    "cloud:export": "tsx cloud/export.ts"
+    "cloud:export": "tsx cloud/export.ts",
+    "start": "node --env-file-if-exists=.env dist/app/server.js",
+    "dev": "node --env-file-if-exists=.env --import tsx app/server.ts",
+    "setup": "node --env-file-if-exists=.env --import tsx app/setup.ts",
+    "build": "node scripts/build-platform.mjs",
+    "platform:cloud:check": "tsc -p app/tsconfig.cloud.json",
+    "test:browser": "playwright test",
+    "test:d1": "tsx scripts/test-d1.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0",
@@ -38,6 +45,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20261024.1",
     "@fontsource-variable/manrope": "^5.3.0",
+    "@playwright/test": "^1.62.1",
     "@types/node": "^22.0.0",
     "prettier": "^3.9.10",
     "tsx": "^4.20.0",
@@ -47,7 +55,7 @@
   "overrides": {
     "undici": "^7.30.1"
   },
-  "description": "Velug plant research and sales qualification prototype",
+  "description": "Company-isolated inventory research and sales qualification by Velug",
   "license": "MIT",
   "homepage": "https://github.com/pranavred/velug-associated-sales",
   "repository": {

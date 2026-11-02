@@ -1,83 +1,68 @@
 # Associated Sales by Velug
 
-An open-source prototype for researching industrial facilities, retaining source evidence, and helping sales representatives ask better qualification questions.
+Connect your inventory, research a manufacturer or buyer, and prepare relevant upsell and add-on sales questions. Built by [Velug AI](https://velug.ai), available under the MIT license.
 
-Built by [Velug AI](https://velug.ai). **Prototype status: suitable for local evaluation; not a production service for customer inventories.**
+## Company workspace
 
-## What works today
+- **Inventory:** CSV/JSON uploads with column mapping, atomic source snapshots or upserts, stable SKUs, freshness/stock/region checks, and a scoped integration API.
+- **Separate company access:** individual accounts, owner/member roles, one-use invitations, immediate revocation, company switching, and isolated inventory/research records.
+- **Company research:** standard or deeper web research through OpenAI, cited evidence with dates, catalog-constrained matching, and explicit unknowns.
+- **Better sales questions:** product-specific qualification questions, missing requirements, disqualifying conditions, saved answers, and human review decisions.
+- **Portable deployment:** Docker Compose or native Node + SQLite; Cloudflare Workers + D1 + Workflows; root or `/associated-sales` hosting.
 
-- Collect approved public HTML/PDF sources and preserve document versions.
-- Discover sources and propose cited plant profiles through an optional Anthropic integration.
-- Review exact quotes, source locations, changes, and missing evidence.
-- Suggest chemical application hypotheses and follow-up questions using a small, curated rule library.
-- Suppress opportunities for closure-held facilities and exclude rejected claims.
-- Run a deterministic synthetic demonstration without an API key or model calls.
+No public signup is enabled. A company owner grants access. Inventory integration is a generic CSV/JSON/API adapter, not a packaged native connector for a particular ERP. See [inventory integration](docs/inventory-api.md).
 
-An example question is: “Does the current cleaning program already include the function this proposed add-on provides?” Suggestions are hypotheses for a representative to qualify. They do not establish chemical compatibility, actual usage, demand, purchasing intent, or revenue.
-
-## What is not implemented
-
-Inventory/ERP connectors, catalog ingestion, SKU matching, stock availability, per-company data isolation, individual user accounts, and a production-ready hosted signup flow are not implemented. The cloud research adapter has not been validated with a real model run. The current opportunity rules focus on chemical applications; general industrial-product recommendations require additional rules and evaluation.
-
-The intended workflow is **seller inventory → buyer research → eligible products → evidence and missing information → rep questions → human-qualified opportunity**. Only the research, evidence, and initial question-generation portions exist today. See [the implementation requirements](docs/production-roadmap.md).
-
-## Run locally
-
-Requires Node.js 22.13+ and npm.
+## Start inside your company
 
 ```sh
-npm ci
-npm run prepare-demo
-npm run dashboard
+cp .env.example .env
+# Set the initial company/email/password and your OPENAI_API_KEY privately.
+docker compose up -d --build
 ```
 
-Open http://127.0.0.1:4317. Demo records are explicitly synthetic, even where facility names refer to real places. No customer relationships or endorsements are implied. The local dashboard has no authentication and binds to localhost; keep it local.
+Open `http://127.0.0.1:4319/associated-sales`. Remove the bootstrap password after initialization. Native Node installation, HTTPS/proxy configuration, backups, identity limitations, and Cloudflare deployment are covered in [self-hosting](docs/self-hosting.md).
 
-For public-source collection:
+The source is free. AI/search API calls and hosting may cost money. Each company has a persistent daily model-call cap; it limits attempts, not dollars. Without a provider key, inventory and account management still work.
 
-```sh
-npm run collect -- --source SRC-001
-PORT=4318 npm run dashboard -- --mode live
-```
+## What a suggestion means
 
-For optional model calls, copy `.env.example` to `.env`, supply your own `ANTHROPIC_API_KEY`, and select a model available to your account:
+The flow is **seller inventory → buyer research → eligible catalog shortlist → evidence and unknowns → rep questions → human qualification**.
 
-```sh
-npm run discover -- --plant PLANT-001
-npm run synthesize -- --plant PLANT-001
-```
+Only supplied product IDs and cited source IDs can appear in a result. Inactive, zero-stock, stale, or region-excluded products are filtered out, and current availability is checked again before qualification. Unknown stock/regions are explicitly unconfirmed. The default matcher examines up to 10,000 products and sends an 80-product shortlist; coverage and truncation are shown.
 
-These commands use paid external APIs. Discovered local sources require approval; new publisher hosts require explicit allowlisting in `src/collect.ts`. Exact quote validation establishes traceability, not semantic correctness. Review every finding before using it in a sales conversation.
+AI findings and evidence dates can be wrong. A citation establishes a reference, not independent semantic verification. Historical or undated evidence adds a question confirming whether the process still exists. Suggestions do not establish chemical compatibility, actual usage, demand, purchasing intent, or revenue. Qualified technical staff must review product suitability before quoting or changing a process.
+
+The application sends target-company information and selected product descriptions/specifications to OpenAI with `store:false`. Stock quantities, credentials, and integration tokens are excluded. See the deployment guide for data-handling details and operational limits.
 
 ## Verify
 
 ```sh
+npm ci
 npm run verify
-npm run cloud:check
-npx wrangler deploy --dry-run --config wrangler.example.jsonc
+npm run build
+npm run platform:cloud:check
+npm run test:d1
+npx playwright install chromium
+npm run test:browser
+npx wrangler deploy --dry-run --config wrangler.platform.example.jsonc
 npm audit
 ```
 
-The initial release passed 34 tests, both TypeScript checks, synthetic demo generation, and Worker bundling. The tests use fixtures and a mocked model adapter; they are not evidence of live AI accuracy. Verification records are in `docs/verification/`.
+CI also builds and boots the Docker image and checks persisted account login after restart. A live provider check is opt-in and billable: run `node --env-file=.env --import tsx scripts/live-validation.ts`. It uses a public manufacturer and synthetic products, then writes the report to ignored `data/live-validation.json`. Deterministic tests do not prove general model accuracy. See [verification records](docs/verification/).
 
-## Hosting and cost
+## Legacy evidence demonstration
 
-The source code is free under MIT. The synthetic local demo makes no paid service calls. Model/search usage and hosted infrastructure can cost money; hosting free tiers have limits. The daily model-call cap limits attempts, not dollars.
+The original local evidence/quote-review demonstration remains under `src/`, with its separate Cloudflare example under `cloud/`. It uses synthetic fixtures and an optional Anthropic adapter; it is not the company workspace runtime.
 
-The `cloud/` implementation targets Cloudflare Workers, Workflows, D1, and R2. `wrangler.example.jsonc` contains placeholder resources, disables public Worker URLs, and has no scheduled trigger. It is an example, not a ready production configuration. It uses a shared private-demo password, not separate customer accounts.
+```sh
+npm run prepare-demo
+PORT=4317 npm run dashboard
+```
 
-Before any deployment, provision separate resources, initialize the database schemas and data, set secrets securely, and complete [the production roadmap](docs/production-roadmap.md). The app currently assumes domain-root paths. Hosting at `/associated-sales` requires routing, assets, redirects, cookies, and API URLs to support that prefix.
+Keep that unauthenticated localhost dashboard private. Do not point the new application at its database or deploy its shared-password Worker as the company platform.
 
-## Included and excluded content
+## License and included content
 
-This repository contains source code, tests, public-source seed URLs, synthetic fixture generation, and the licensed Manrope font. It excludes original research databases, downloaded publisher documents, third-party plant photos, secrets, and machine-specific QA scripts. The evaluation reference checklist is specific to the original five-facility demonstration and is not a general model benchmark.
+[MIT](LICENSE), copyright Pranav Reddy. Repository content includes source, tests, public-source seed URLs, synthetic fixtures, and the licensed Manrope font. It excludes private inventories, downloaded publisher documents, third-party plant photos, credentials, and machine-specific configurations.
 
-Third-party dependencies retain their own licenses; see [dependency licenses](docs/dependency-licenses.csv), [third-party notices](THIRD_PARTY_NOTICES.md), and [the font license](assets/FONT-LICENSE.txt). Downloaded material is not covered by this repository's MIT license.
-
-## Contributing
-
-Open an issue with a reproducible example or propose an adapter against the documented inventory requirements. Use synthetic data in issues and tests. Do not upload customer inventories, credentials, proprietary pricing, or downloaded source archives.
-
-## License
-
-[MIT](LICENSE), copyright 2026 Pranav Reddy. This is a Velug project; it is not affiliated with or endorsed by the companies named in sample data.
+Dependencies retain their own licenses: [dependency inventory](docs/dependency-licenses.csv), [third-party notices](THIRD_PARTY_NOTICES.md), and [font license](assets/FONT-LICENSE.txt). Downloaded source material is not covered by this repository's MIT license. No researched company is implied to be a customer or to endorse Velug.

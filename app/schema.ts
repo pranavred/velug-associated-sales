@@ -8,9 +8,11 @@ CREATE TABLE IF NOT EXISTS invites(id TEXT PRIMARY KEY,company_id TEXT NOT NULL 
 CREATE TABLE IF NOT EXISTS rate_limits(key TEXT PRIMARY KEY,attempts INTEGER NOT NULL,expires_at INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS integration_tokens(id TEXT PRIMARY KEY,company_id TEXT NOT NULL REFERENCES companies(id),source TEXT NOT NULL,label TEXT NOT NULL,hash TEXT NOT NULL UNIQUE,created_at INTEGER NOT NULL,revoked_at INTEGER);
 CREATE TABLE IF NOT EXISTS inventory(id TEXT PRIMARY KEY,company_id TEXT NOT NULL REFERENCES companies(id),source TEXT NOT NULL,sku TEXT NOT NULL,record TEXT NOT NULL,updated_at INTEGER NOT NULL,UNIQUE(company_id,source,sku));
+CREATE TABLE IF NOT EXISTS inventory_sources(company_id TEXT NOT NULL,source TEXT NOT NULL,as_of INTEGER NOT NULL CHECK(as_of>=0),PRIMARY KEY(company_id,source));
 CREATE INDEX IF NOT EXISTS inventory_company ON inventory(company_id,source);
 CREATE TABLE IF NOT EXISTS imports(id TEXT PRIMARY KEY,company_id TEXT NOT NULL,source TEXT NOT NULL,request_key TEXT NOT NULL,digest TEXT NOT NULL,receipt TEXT NOT NULL,created_at INTEGER NOT NULL,UNIQUE(company_id,source,request_key));
 CREATE TABLE IF NOT EXISTS research_jobs(id TEXT PRIMARY KEY,company_id TEXT NOT NULL REFERENCES companies(id),user_id TEXT NOT NULL,input TEXT NOT NULL,fingerprint TEXT NOT NULL,status TEXT NOT NULL,phase TEXT NOT NULL DEFAULT 'queued',lease TEXT,lease_until INTEGER NOT NULL DEFAULT 0,research TEXT,candidates TEXT,result TEXT,error TEXT,created_at INTEGER NOT NULL,updated_at INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS research_requests(company_id TEXT NOT NULL,request_key TEXT NOT NULL,job_id TEXT NOT NULL REFERENCES research_jobs(id),fingerprint TEXT NOT NULL,PRIMARY KEY(company_id,request_key));
 CREATE UNIQUE INDEX IF NOT EXISTS active_research_input ON research_jobs(company_id,fingerprint) WHERE status IN ('queued','running');
 CREATE INDEX IF NOT EXISTS research_company ON research_jobs(company_id,created_at);
 CREATE TABLE IF NOT EXISTS budgets(company_id TEXT NOT NULL,day TEXT NOT NULL,calls INTEGER NOT NULL,PRIMARY KEY(company_id,day));

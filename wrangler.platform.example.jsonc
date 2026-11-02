@@ -1,0 +1,20 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "associated-sales-platform",
+  "main": "app/cloud.ts",
+  "compatibility_date": "2026-10-24",
+  "workers_dev": true,
+  "assets": { "directory": "app/public", "binding": "ASSETS", "run_worker_first": true },
+  "vars": {
+    "PUBLIC_ORIGIN": "http://localhost:8787",
+    "BASE_PATH": "/associated-sales",
+    "OPENAI_MODEL": "gpt-4.1-2025-04-14",
+    "MAX_MODEL_CALLS_PER_DAY": "20",
+    "INVENTORY_MAX_AGE_DAYS": "30",
+    "MAX_CATALOG_CANDIDATES": "80"
+  },
+  "d1_databases": [{ "binding": "DB", "database_name": "associated-sales-platform", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "migrations" }],
+  "workflows": [{ "binding": "RESEARCH", "name": "associated-sales-research", "class_name": "ResearchWorkflow" }],
+  "triggers": { "crons": ["*/10 * * * *"] },
+  "observability": { "enabled": false }
+}

@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "outDir": "dist/app",
+    "rootDir": "app"
+  },
+  "include": ["app/**/*.ts"],
+  "exclude": ["app/cloud.ts", "app/d1-db.ts"]
+}
