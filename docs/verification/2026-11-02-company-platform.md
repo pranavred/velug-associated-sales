@@ -12,7 +12,7 @@ Scope: new `app/` runtime, preserving the legacy `src/` demonstration.
 - Dependency audit reported zero vulnerabilities. Dependency licenses refreshed.
 - Independent reviews found and drove fixes for expired leases, configurable stock age, durable request idempotency, revoked invitations, stale-tab company targeting, explicit column omissions, and queued Workflow reconciliation. No unresolved findings remained in the final rereview.
 
-Local Docker daemon was unavailable; the release workflow builds, boots, and restarts the container and checks login persistence. Consult the exact commit's CI result for that evidence.
+The local Docker daemon was unavailable. [Release CI](https://github.com/pranavred/velug-associated-sales/actions/runs/41536975292) built, booted, and restarted the container and verified account login persistence.
 
 ## Live AI validation
 
@@ -29,3 +29,5 @@ Raw live outputs and provider credentials are excluded from the repository. The 
 ## Deployment evidence
 
 Deployment uses fresh Cloudflare Worker/D1/Workflow resources, and a narrow website rewrite from the website's exact previously deployed commit. Existing legacy resources and unrelated local website changes are preserved. Final production URL and CI verification are recorded in the release result.
+
+The first hosted Workflow check found an ambient-fetch receiver error specific to Workers. A real workerd test reproduced the failure with intercepted provider HTTP; an arrow wrapper preserves the native receiver, and the regression now runs in CI (`npm run test:worker-provider`). The failed job remains visible; it was not silently retried.

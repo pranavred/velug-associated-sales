@@ -42,6 +42,7 @@ npm run verify
 npm run build
 npm run platform:cloud:check
 npm run test:d1
+npm run test:worker-provider
 npx playwright install chromium
 npm run test:browser
 npx wrangler deploy --dry-run --config wrangler.platform.example.jsonc

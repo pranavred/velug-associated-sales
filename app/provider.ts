@@ -182,7 +182,7 @@ function usage(response: any): Usage {
 export class OpenAIProvider implements Provider {
   constructor(
     private config: Config,
-    private fetcher: typeof fetch = fetch,
+    private fetcher: typeof fetch = (...args) => fetch(...args),
   ) {}
   private async request(body: Record<string, unknown>) {
     if (!this.config.apiKey) fail(503, "Research provider is not configured");

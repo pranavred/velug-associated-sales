@@ -19,6 +19,7 @@ jobs:
       - run: npm run build
       - run: npm run platform:cloud:check
       - run: npm run test:d1
+      - run: npm run test:worker-provider
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
       - run: npx wrangler deploy --dry-run --config wrangler.platform.example.jsonc
