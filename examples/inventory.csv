@@ -1,0 +1,4 @@
+sku,name,description,applications,quantity,unit,regions,grade,specifications,active
+SAMPLE-FILTER,Sample process-water filter,Illustrative inventory item for a pilot demonstration,water treatment|filtration,25,each,US,Industrial,Confirm flow rate and materials,true
+SAMPLE-CLEANER,Sample cleaning aid,Illustrative formulated cleaning aid; technical approval required,cleaning|CIP,100,liters,US|CA,Unqualified,Confirm process compatibility and required certifications,true
+SAMPLE-OUT,Sample unavailable part,Excluded because reported stock is zero,maintenance,0,each,US,Industrial,Example only,true
