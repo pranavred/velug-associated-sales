@@ -45,7 +45,9 @@ export async function startServer(env = process.env) {
                 ? "text/javascript; charset=utf-8"
                 : name.endsWith(".csv")
                   ? "text/csv; charset=utf-8"
-                  : "font/woff2",
+                  : name.endsWith(".txt")
+                    ? "text/plain; charset=utf-8"
+                    : "font/woff2",
         },
       });
     } catch {

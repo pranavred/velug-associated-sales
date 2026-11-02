@@ -2,6 +2,8 @@
 
 Connect your inventory, research a manufacturer or buyer, and prepare relevant upsell and add-on sales questions. Built by [Velug AI](https://velug.ai), available under the MIT license.
 
+[Hosted workspace](https://velug.ai/associated-sales) · invitation required.
+
 ## Company workspace
 
 - **Inventory:** CSV/JSON uploads with column mapping, atomic source snapshots or upserts, stable SKUs, freshness/stock/region checks, and a scoped integration API.

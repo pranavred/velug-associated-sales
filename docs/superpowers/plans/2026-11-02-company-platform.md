@@ -60,13 +60,13 @@ Consumes domain functions; produces prefix-safe JSON routes and accessible works
 
 Files: `Dockerfile`, `compose.yaml`, `.dockerignore`, `.env.example`, `app/cloud.ts`, `wrangler.platform.example.jsonc`, `scripts/*`, `docs/self-hosting.md`, `docs/inventory-api.md`, `.github/workflows/verify.yml`.
 Consumes shared router/job logic; produces repeatable self-host bootstrap and a fresh Worker/D1/Workflow deployment.
-- [ ] Verify runtime parity in local D1 and persistent database reopen; implement Docker and migration/setup/backup instructions.
-- [ ] Build/run container or verify it in CI; provision new cloud resources, initialize owner securely and deploy.
-- [ ] Add isolated Velug prefix proxy from its deployed baseline; verify preview then production paths/auth and existing website routes.
+- [x] Verify runtime parity in local D1 and persistent database reopen; implement Docker and migration/setup/backup instructions.
+- [x] Build/run container or verify it in CI; provision new cloud resources, initialize owner securely and deploy.
+- [x] Add isolated Velug prefix proxy from its deployed baseline; verify preview then production paths/auth and existing website routes.
 
 ### Task 6: Review, release and evidence
 
-- [ ] Obtain fresh security/correctness review against this spec and full diff; fix material findings with regression tests.
-- [ ] Run final tests, type checks, builds, dependency/secret scans, live validation, and deployed health/flow checks.
-- [ ] Update README/roadmap and publish the verified source to the existing GitHub repository; verify CI.
-- [ ] Report live URL, local deployment commands, inventory connection options and material limitations. No company outreach is sent.
+- [x] Obtain fresh security/correctness review against this spec and full diff; fix material findings with regression tests.
+- [x] Run final tests, type checks, builds, dependency/secret scans, live validation, and deployed health/flow checks.
+- [x] Update README/roadmap and publish the verified source to the existing GitHub repository; verify CI.
+- [x] Report live URL, local deployment commands, inventory connection options and material limitations. No company outreach is sent.

@@ -31,3 +31,9 @@ Raw live outputs and provider credentials are excluded from the repository. The 
 Deployment uses fresh Cloudflare Worker/D1/Workflow resources, and a narrow website rewrite from the website's exact previously deployed commit. Existing legacy resources and unrelated local website changes are preserved. Final production URL and CI verification are recorded in the release result.
 
 The first hosted Workflow check found an ambient-fetch receiver error specific to Workers. A real workerd test reproduced the failure with intercepted provider HTTP; an arrow wrapper preserves the native receiver, and the regression now runs in CI (`npm run test:worker-provider`). The failed job remains visible; it was not silently retried.
+
+The corrected production Cloudflare Workflow completed a fresh explicit run: 16 cited sources, two catalog opportunities, two recorded model calls, the zero-stock item excluded, and a cross-company result request rejected with 404. The synthetic catalog/results are isolated in a clearly named demo company; the primary Velug company has no imported customer inventory.
+
+Production URL: [velug.ai/associated-sales](https://velug.ai/associated-sales). A fresh Chromium session verified owner login, company switching, the two live research cards, mobile layout without horizontal overflow, and logout through this exact prefixed URL, with no browser errors. Prefix HTML, JavaScript, and health endpoints returned 200; the existing homepage returned 200 with its expected content. Website validation passed 205 unit tests (one skipped), its production build, and rendered-HTML verification.
+
+The [runtime-fix CI run](https://github.com/pranavred/velug-associated-sales/actions/runs/41537515242) passed all checks, including the real Worker provider regression and Docker build/restart verification. The release also preserves the font license alongside the served font and project notices in the Docker runtime.
